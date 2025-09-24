@@ -1,8 +1,0 @@
-
-name: Clang Format Release
-on:
-  workflow_dispatch:
-
-jobs:
-  release:
-    uses: shenxianpeng/clang-tools-wheel/clang-tidy/.github/workflows/release.yml

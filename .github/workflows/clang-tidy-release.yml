@@ -1,4 +1,4 @@
-name: Build + Release Wheels
+name: Build clang-tidy wheels
 
 on:
   push:
