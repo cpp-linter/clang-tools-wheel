@@ -1,0 +1,469 @@
+name: Build clang-tools wheels
+
+on:
+  push:
+    tags:
+      - 'v?[0-9]+.[0-9]+.[0-9]+'
+      - 'v?[0-9]+.[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      llvm_version:
+        description: "LLVM version to build"
+        required: false
+        default: ""
+      wheel_version:
+        description: "Version of the wheel packaging (appended to LLVM version)"
+        required: false
+        default: "0"
+      skip_emulation:
+        description: "Emulation builds to skip (e.g. qemu)"
+        required: false
+        default: ""
+
+jobs:
+  build-clang-format-wheels:
+    name: "clang-format :: ${{ matrix.os }} :: ${{ matrix.platform }}-${{ matrix.arch }}"
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # emulated linux: generate 4 matrix combinations with qemu on ubuntu:
+        arch: ["ppc64le", "s390x"]
+        platform: ["manylinux", "musllinux"]
+        os: [ubuntu-latest]
+        emulation: ["qemu"]
+        exclude:
+          # conditionally skip jobs requiring emulation:
+          - os: ubuntu-latest
+            emulation: ${{ github.event.inputs.skip_emulation }}
+        include:
+          # linux
+          - os: ubuntu-latest
+            platform: "manylinux"
+            arch: "x86_64"
+          - os: ubuntu-latest
+            platform: "manylinux"
+            arch: "i686"
+          - os: ubuntu-latest
+            platform: "musllinux"
+            arch: "x86_64"
+          - os: ubuntu-latest
+            platform: "musllinux"
+            arch: "i686"
+          - os: ubuntu-24.04-arm
+            platform: "manylinux"
+            arch: "aarch64"
+          - os: ubuntu-24.04-arm
+            platform: "musllinux"
+            arch: "aarch64"
+          - os: ubuntu-24.04-arm
+            platform: "manylinux"
+            arch: "armv7l"
+          - os: ubuntu-24.04-arm
+            platform: "musllinux"
+            arch: "armv7l"
+          # windows
+          - os: windows-latest
+            platform: "win"
+            arch: "AMD64"
+          - os: windows-latest
+            platform: "win"
+            arch: "x86"
+          - os: windows-11-arm
+            platform: "win"
+            arch: "ARM64"
+          # macos
+          - os: macos-13
+            platform: "macos"
+            arch: "x86_64"
+          - os: macos-latest
+            platform: "macos"
+            arch: "arm64"
+
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        sparse-checkout: |
+          clang-format
+        sparse-checkout-cone-mode: true
+        submodules: true
+
+    - name: Move clang-format contents to root
+      shell: bash
+      run: |
+        if [ -d "clang-format" ]; then
+          # Move all files and directories, excluding .git
+          find clang-format -mindepth 1 -maxdepth 1 ! -name '.git' -exec mv {} . \;
+          # Remove any remaining files and the directory
+          rm -rf clang-format
+        fi
+
+    - name: Support long paths on Windows
+      if: runner.os == 'Windows'
+      run: git config --system core.longpaths true
+
+    - name: Set up msvc on Windows
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.arch }}
+
+    - name: Remove strip binaries on arm64 windows runner to avoid "file format not recognized" error when running strip
+      if: matrix.platform == 'win' && matrix.arch == 'ARM64'
+      run: |
+        rm C:\mingw64\bin\strip.exe
+        rm C:\Strawberry\c\bin\strip.exe
+
+    - name: Override LLVM version (${{ github.event.inputs.llvm_version }})
+      if: github.event.inputs.llvm_version
+      run: |
+        echo "${{ github.event.inputs.llvm_version }}.${{ github.event.inputs.wheel_version }}" > clang-format_version.txt
+        cat clang-format_version.txt
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3.6.0
+      with:
+        image: tonistiigi/binfmt:qemu-v8.1.5
+      if: runner.os == 'Linux' && matrix.emulation == 'qemu'
+
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v3.1
+      env:
+        CIBW_ARCHS: "${{ matrix.arch }}"
+        # restrict to a single Python version as wheel does not depend on Python:
+        CIBW_BUILD: "cp311-${{ matrix.platform }}*"
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: clang-format-wheels-${{ matrix.platform }}-${{ matrix.arch }}
+        path: ./wheelhouse/*.whl
+
+  build-clang-tidy-wheels:
+    name: "clang-tidy :: ${{ matrix.os }} :: ${{ matrix.platform }}-${{ matrix.arch }}"
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          # Linux
+          - os: ubuntu-latest
+            platform: "manylinux"
+            arch: "x86_64"
+          - os: ubuntu-latest
+            platform: "musllinux"
+            arch: "x86_64"
+          - os: ubuntu-latest
+            platform: "manylinux"
+            arch: "i686"
+          - os: ubuntu-latest
+            platform: "musllinux"
+            arch: "i686"
+          - os: ubuntu-24.04-arm
+            platform: "manylinux"
+            arch: "aarch64"
+          # Windows
+          - os: windows-latest
+            platform: "win"
+            arch: "AMD64"
+          - os: windows-latest
+            platform: "win"
+            arch: "x86"
+          # macOS
+          - os: macos-13
+            platform: "macos"
+            arch: "x86_64"
+          - os: macos-latest
+            platform: "macos"
+            arch: "arm64"
+
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        sparse-checkout: |
+          clang-tidy
+        sparse-checkout-cone-mode: true
+        submodules: true
+
+    - name: Move clang-tidy contents to root
+      shell: bash
+      run: |
+        if [ -d "clang-tidy" ]; then
+          # Move all files and directories, excluding .git
+          find clang-tidy -mindepth 1 -maxdepth 1 ! -name '.git' -exec mv {} . \;
+          # Remove any remaining files and the directory
+          rm -rf clang-tidy
+        fi
+
+    - name: Support long paths
+      if: runner.os == 'Windows'
+      run: git config --system core.longpaths true
+
+    - name: Set up msvc on Windows
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.arch }}
+
+    - name: Export macOS SDKROOT
+      if: runner.os == 'macOS'
+      run: echo SDKROOT=$(xcrun --sdk macosx --show-sdk-path) >> $GITHUB_ENV
+
+    - name: Override LLVM version (${{ github.event.inputs.llvm_version }})
+      if: github.event.inputs.llvm_version
+      run: |
+        echo "${{ github.event.inputs.llvm_version }}.${{ github.event.inputs.wheel_version }}" > clang-tidy_version.txt
+        cat clang-tidy_version.txt
+
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v2.23.2
+      env:
+        CIBW_ARCHS: "${{ matrix.arch }}"
+        CIBW_BEFORE_TEST: rm -rf {package}/clang_tidy
+        CIBW_TEST_SKIP: "*linux*"
+        # always skip PyPY builds + what's defined in the matrix
+        CIBW_SKIP: "pp* ${{matrix.skip}}"
+        # restrict to a single Python version as wheel does not depend on Python:
+        CIBW_BUILD: "cp311-${{ matrix.platform }}*"
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: clang-tidy-wheels-${{ matrix.platform }}-${{ matrix.arch }}
+        path: ./wheelhouse/*.whl
+
+  build-clang-format-sdist:
+    name: Build clang-format source distribution
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            clang-format
+          sparse-checkout-cone-mode: true
+          submodules: true
+
+      - name: Move clang-format contents to root
+        shell: bash
+        run: |
+          if [ -d "clang-format" ]; then
+            # Move all files and directories, excluding .git
+            find clang-format -mindepth 1 -maxdepth 1 ! -name '.git' -exec mv {} . \;
+            # Remove any remaining files and the directory
+            rm -rf clang-format
+          fi
+
+      - name: Override LLVM version (${{ github.event.inputs.llvm_version }})
+        if: github.event.inputs.llvm_version
+        run: |
+          echo "${{ github.event.inputs.llvm_version }}.${{ github.event.inputs.wheel_version }}" > clang-format_version.txt
+          cat clang-format_version.txt
+ 
+      - name: Build SDist
+        run: pipx run build --sdist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clang-format-sdist
+          path: dist/*.tar.gz
+
+  build-clang-tidy-sdist:
+    name: Build clang-tidy source distribution
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            clang-tidy
+          sparse-checkout-cone-mode: true
+          submodules: true
+
+      - name: Move clang-tidy contents to root
+        shell: bash
+        run: |
+          if [ -d "clang-tidy" ]; then
+            # Move all files and directories, excluding .git
+            find clang-tidy -mindepth 1 -maxdepth 1 ! -name '.git' -exec mv {} . \;
+            # Remove any remaining files and the directory
+            rm -rf clang-tidy
+          fi
+
+      - name: Override LLVM version (${{ github.event.inputs.llvm_version }})
+        if: github.event.inputs.llvm_version
+        run: |
+          echo "${{ github.event.inputs.llvm_version }}.${{ github.event.inputs.wheel_version }}" > clang-tidy_version.txt
+          cat clang-tidy_version.txt
+
+      - name: Build SDist
+        run: pipx run build --sdist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          path: dist/*.tar.gz
+          name: clang-tidy-sdist
+
+  test-clang-format-sdist:
+    name: Test clang-format build from source distribution
+    needs: [build-clang-format-sdist]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            clang-format
+          sparse-checkout-cone-mode: true
+          submodules: true
+
+      - name: Move clang-format contents to root
+        shell: bash
+        run: |
+          if [ -d "clang-format" ]; then
+            # Move all files and directories, excluding .git
+            find clang-format -mindepth 1 -maxdepth 1 ! -name '.git' -exec mv {} . \;
+            # Remove any remaining files and the directory
+            rm -rf clang-format
+          fi
+
+      - uses: actions/setup-python@v5
+        name: Install Python
+        with:
+          python-version: '3.13'
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: clang-format-sdist
+          path: sdist
+
+      - name: Install from SDist
+        run:
+          pip install sdist/*.tar.gz
+
+      - name: Install test requirements
+        run:
+          pip install --group dev
+
+      - name: Set up Git identity
+        run: |
+          git config --global user.name Name
+          git config --global user.email foo@bar.com
+
+      - name: Run test suite
+        working-directory: test
+        run:
+          python -m pytest --import-mode=importlib -vvv
+
+  test-clang-tidy-sdist:
+    name: Test clang-tidy build from source distribution
+    needs: [build-clang-tidy-sdist]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            clang-tidy
+          sparse-checkout-cone-mode: true
+          submodules: true
+
+      - name: Move clang-tidy contents to root
+        shell: bash
+        run: |
+          if [ -d "clang-tidy" ]; then
+            # Move all files and directories, excluding .git
+            find clang-tidy -mindepth 1 -maxdepth 1 ! -name '.git' -exec mv {} . \;
+            # Remove any remaining files and the directory
+            rm -rf clang-tidy
+          fi
+
+      - uses: actions/setup-python@v5
+        name: Install Python
+        with:
+          python-version: '3.13'
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: clang-tidy-sdist
+          path: sdist
+
+      - name: Install from SDist
+        run: |
+          rm -r clang_tidy
+          pip install sdist/*.tar.gz
+
+      - name: Install test requirements
+        run:
+          python -m pip install -r requirements-dev.txt
+
+      - name: Run test suite
+        run:
+          python -m pytest
+
+  create-draft-release:
+    name: Create draft release on GitHub
+    needs: [
+      build-clang-format-wheels, 
+      build-clang-tidy-wheels,
+      build-clang-format-sdist,
+      build-clang-tidy-sdist,
+      test-clang-format-sdist,
+      test-clang-tidy-sdist
+    ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: clang-format-*
+          merge-multiple: true
+          path: clang-format-dist
+
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: clang-tidy-*
+          merge-multiple: true
+          path: clang-tidy-dist
+
+      - name: Organize artifacts
+        run: |
+          mkdir -p release-assets
+          # Copy clang-format artifacts
+          find clang-format-dist -name "*.whl" -exec cp {} release-assets/ \;
+          find clang-format-dist -name "*.tar.gz" -exec cp {} release-assets/ \;
+          # Copy clang-tidy artifacts
+          find clang-tidy-dist -name "*.whl" -exec cp {} release-assets/ \;
+          find clang-tidy-dist -name "*.tar.gz" -exec cp {} release-assets/ \;
+          
+          echo "Release assets:"
+          ls -la release-assets/
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          draft: true
+          files: release-assets/*
+          name: "Clang Tools ${{ github.ref_name }}"
+          body: |
+            # Clang Tools Release ${{ github.ref_name }}
+            
+            This release contains both clang-format and clang-tidy wheel packages.
+            
+            ## Included packages:
+            - **clang-format**: Code formatting tool
+            - **clang-tidy**: Static analysis and linting tool
+            
+            ## Installation:
+            ```bash
+            # Install clang-format
+            pip install clang-format-<version>-<platform>.whl
+            
+            # Install clang-tidy  
+            pip install clang-tidy-<version>-<platform>.whl
+            ```
+            
+            ## Assets:
+            - `.whl` files: Binary wheel packages for different platforms
+            - `.tar.gz` files: Source distributions
