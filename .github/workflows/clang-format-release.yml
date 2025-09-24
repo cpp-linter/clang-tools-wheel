@@ -5,4 +5,4 @@ on:
 
 jobs:
   release:
-    uses: ./clang-format/.github/workflows/release.yml
+    uses: shenxianpeng/clang-tools-wheel/clang-format/.github/workflows/release.yml
