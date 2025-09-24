@@ -61,6 +61,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v5
+      with:
+        sparse-checkout: |
+          clang-tidy
+        sparse-checkout-cone-mode: true
+        submodules: true
+
+    - name: Move clang-tidy contents to root
+      shell: bash
+      run: |
+        ls -lah
+        mv clang-tidy/* .
+        rm -rf clang-tidy
+        ls -lah
 
     - name: Support long paths
       if: runner.os == 'Windows'
@@ -104,6 +117,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            clang-tidy
+          sparse-checkout-cone-mode: true
+          submodules: true
+
+      - name: Move clang-tidy contents to root
+        shell: bash
+        run: |
+          ls -lah
+          mv clang-tidy/* .
+          rm -rf clang-tidy
+          ls -lah
 
       - name: Override LLVM version (${{ github.event.inputs.llvm_version }})
         if: github.event.inputs.llvm_version
@@ -125,6 +151,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            clang-tidy
+          sparse-checkout-cone-mode: true
+          submodules: true
+
+      - name: Move clang-tidy contents to root
+        shell: bash
+        run: |
+          ls -lah
+          mv clang-tidy/* .
+          rm -rf clang-tidy
+          ls -lah
 
       - uses: actions/setup-python@v5
         name: Install Python
