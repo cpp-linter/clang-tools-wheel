@@ -86,7 +86,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v5
-    
+      with:
+        sparse-checkout: |
+          clang-format
+        sparse-checkout-cone-mode: true
+        submodules: true
+
+    - name: Move clang-format contents to root
+      shell: bash
+      run: |
+        ls -lah
+        mv clang-format/* .
+        rm -rf clang-format
+        ls -lah
+
     - name: Support long paths on Windows
       if: runner.os == 'Windows'
       run: git config --system core.longpaths true
@@ -133,6 +146,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            clang-format
+          sparse-checkout-cone-mode: true
+          submodules: true
+
+      - name: Move clang-format contents to root
+        shell: bash
+        run: |
+          ls -lah
+          mv clang-format/* .
+          rm -rf clang-format
+          ls -lah
 
       - name: Override LLVM version (${{ github.event.inputs.llvm_version }})
         if: github.event.inputs.llvm_version
@@ -155,6 +181,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            clang-format
+          sparse-checkout-cone-mode: true
+          submodules: true
+
+      - name: Move clang-format contents to root
+        shell: bash
+        run: |
+          ls -lah
+          mv clang-format/* .
+          rm -rf clang-format
+          ls -lah
 
       - uses: actions/setup-python@v5
         name: Install Python
