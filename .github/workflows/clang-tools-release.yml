@@ -397,7 +397,7 @@ jobs:
 
       - name: Run test suite
         run:
-          python -m pytest
+          python -m pytest --import-mode=importlib
 
   create-draft-release:
     name: Create draft release on GitHub
