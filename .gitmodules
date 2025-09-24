@@ -1,0 +1,9 @@
+[submodule "clang-format"]
+	path = clang-format
+	url = https://github.com/ssciwr/clang-format-wheel.git
+[submodule "clang-tid"]
+	path = clang-tid
+	url = https://github.com/ssciwr/clang-tidy-wheel.git
+[submodule "clang-tidy"]
+	path = clang-tidy
+	url = https://github.com/ssciwr/clang-tidy-wheel.git
