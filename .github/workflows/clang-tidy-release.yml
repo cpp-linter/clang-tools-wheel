@@ -15,68 +15,43 @@ on:
         description: "Version of the wheel packaging (appended to LLVM version)"
         required: false
         default: "0"
-      skip_emulation:
-        description: "Emulation builds to skip (e.g. qemu)"
-        required: false
-        default: ""
       deploy_to_testpypi:
-        description: "Whether the build should be deployed to test.pypi.org instead regular PyPI"
+        description: "Whether the build should be deployed to test.pypi.org instead of regular PyPI"
         required: true
         default: false
 
 jobs:
   build-wheels:
-    name: "${{ matrix.os }} :: ${{ matrix.platform }}-${{ matrix.arch }}"
+    name: "Build wheels on ${{ matrix.os }} :: platform=${{ matrix.platform }} arch=${{ matrix.arch }}"
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        # emulated linux: generate 4 matrix combinations with qemu on ubuntu:
-        arch: ["ppc64le", "s390x"]
-        platform: ["manylinux", "musllinux"]
-        os: [ubuntu-latest]
-        emulation: ["qemu"]
-        exclude:
-          # conditionally skip jobs requiring emulation:
-          - os: ubuntu-latest
-            emulation: ${{ github.event.inputs.skip_emulation }}
         include:
-          # linux
+          # Linux
           - os: ubuntu-latest
             platform: "manylinux"
+            arch: "x86_64"
+          - os: ubuntu-latest
+            platform: "musllinux"
             arch: "x86_64"
           - os: ubuntu-latest
             platform: "manylinux"
             arch: "i686"
           - os: ubuntu-latest
             platform: "musllinux"
-            arch: "x86_64"
-          - os: ubuntu-latest
-            platform: "musllinux"
             arch: "i686"
           - os: ubuntu-24.04-arm
             platform: "manylinux"
             arch: "aarch64"
-          - os: ubuntu-24.04-arm
-            platform: "musllinux"
-            arch: "aarch64"
-          - os: ubuntu-24.04-arm
-            platform: "manylinux"
-            arch: "armv7l"
-          - os: ubuntu-24.04-arm
-            platform: "musllinux"
-            arch: "armv7l"
-          # windows
+          # Windows
           - os: windows-latest
             platform: "win"
             arch: "AMD64"
           - os: windows-latest
             platform: "win"
             arch: "x86"
-          - os: windows-11-arm
-            platform: "win"
-            arch: "ARM64"
-          # macos
+          # macOS
           - os: macos-13
             platform: "macos"
             arch: "x86_64"
@@ -86,8 +61,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v5
-    
-    - name: Support long paths on Windows
+
+    - name: Support long paths
       if: runner.os == 'Windows'
       run: git config --system core.longpaths true
 
@@ -97,28 +72,24 @@ jobs:
       with:
         arch: ${{ matrix.arch }}
 
-    - name: Remove strip binaries on arm64 windows runner to avoid "file format not recognized" error when running strip
-      if: matrix.platform == 'win' && matrix.arch == 'ARM64'
-      run: |
-        rm C:\mingw64\bin\strip.exe
-        rm C:\Strawberry\c\bin\strip.exe
+    - name: Export macOS SDKROOT
+      if: runner.os == 'macOS'
+      run: echo SDKROOT=$(xcrun --sdk macosx --show-sdk-path) >> $GITHUB_ENV
 
     - name: Override LLVM version (${{ github.event.inputs.llvm_version }})
       if: github.event.inputs.llvm_version
       run: |
-        echo "${{ github.event.inputs.llvm_version }}.${{ github.event.inputs.wheel_version }}" > clang-format_version.txt
-        cat clang-format_version.txt
-
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3.6.0
-      with:
-        image: tonistiigi/binfmt:qemu-v8.1.5
-      if: runner.os == 'Linux' && matrix.emulation == 'qemu'
+        echo "${{ github.event.inputs.llvm_version }}.${{ github.event.inputs.wheel_version }}" > clang-tidy_version.txt
+        cat clang-tidy_version.txt
 
     - name: Build wheels
-      uses: pypa/cibuildwheel@v3.1
+      uses: pypa/cibuildwheel@v2.23.2
       env:
         CIBW_ARCHS: "${{ matrix.arch }}"
+        CIBW_BEFORE_TEST: rm -rf {package}/clang_tidy
+        CIBW_TEST_SKIP: "*linux*"
+        # always skip PyPY builds + what's defined in the matrix
+        CIBW_SKIP: "pp* ${{matrix.skip}}"
         # restrict to a single Python version as wheel does not depend on Python:
         CIBW_BUILD: "cp311-${{ matrix.platform }}*"
 
@@ -137,17 +108,16 @@ jobs:
       - name: Override LLVM version (${{ github.event.inputs.llvm_version }})
         if: github.event.inputs.llvm_version
         run: |
-          echo "${{ github.event.inputs.llvm_version }}.${{ github.event.inputs.wheel_version }}" > clang-format_version.txt
-          cat clang-format_version.txt
- 
+          echo "${{ github.event.inputs.llvm_version }}.${{ github.event.inputs.wheel_version }}" > clang-tidy_version.txt
+          cat clang-tidy_version.txt
       - name: Build SDist
         run: pipx run build --sdist
 
       - uses: actions/upload-artifact@v4
         with:
-          name: artifacts-sdist
           path: dist/*.tar.gz
-  
+          name: artifacts-sdist
+
   test-sdist:
     name: Test build from source distribution
     needs: [build-sdist]
@@ -167,22 +137,17 @@ jobs:
           path: sdist
 
       - name: Install from SDist
-        run:
+        run: |
+          rm -r clang_tidy
           pip install sdist/*.tar.gz
 
       - name: Install test requirements
         run:
-          pip install --group dev
-
-      - name: Set up Git identity
-        run: |
-          git config --global user.name Name
-          git config --global user.email foo@bar.com
+          python -m pip install -r requirements-dev.txt
 
       - name: Run test suite
-        working-directory: test
         run:
-          python -m pytest --import-mode=importlib -vvv
+          python -m pytest
 
   upload_pypi:
     name: Upload to PyPI
@@ -201,11 +166,11 @@ jobs:
           path: dist
 
       - name: Upload to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.13.0
+        uses: pypa/gh-action-pypi-publish@v1.12.4
         if: (startsWith(github.event.ref, 'refs/tags/')) || (github.event.inputs.deploy_to_testpypi == 'false')
 
       - name: Upload to TestPyPI
-        uses: pypa/gh-action-pypi-publish@v1.13.0
+        uses: pypa/gh-action-pypi-publish@v1.12.4
         if: github.event.inputs.deploy_to_testpypi == 'true'
         with:
           repository-url: https://test.pypi.org/legacy/
