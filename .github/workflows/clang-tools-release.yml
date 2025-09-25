@@ -465,9 +465,9 @@ jobs:
           files: release-assets/*
           name: "Clang Tools ${{ github.ref_name }}"
           body: |
-            # Clang Tools Release ${{ github.ref_name }}
+            # Clang Tools Python wheels
             
-            This release contains both clang-format and clang-tidy wheel packages.
+            This release contains both `clang-format` and `clang-tidy` wheel packages.
             
             ## Included packages:
             - **clang-format**: Code formatting tool
