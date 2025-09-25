@@ -91,6 +91,9 @@ jobs:
     - name: Move clang-format contents to root
       shell: bash
       run: |
+        if [ -d "clang-tidy" ]; then
+          rm -rf clang-tidy
+        fi
         if [ -d "clang-format" ]; then
           # Move all files and directories, excluding .git
           find clang-format -mindepth 1 -maxdepth 1 ! -name '.git' -exec mv {} . \;
@@ -187,6 +190,9 @@ jobs:
     - name: Move clang-tidy contents to root
       shell: bash
       run: |
+        if [ -d "clang-format" ]; then
+          rm -rf clang-format
+        fi
         if [ -d "clang-tidy" ]; then
           # Move all files and directories, excluding .git
           find clang-tidy -mindepth 1 -maxdepth 1 ! -name '.git' -exec mv {} . \;
@@ -245,6 +251,9 @@ jobs:
       - name: Move clang-format contents to root
         shell: bash
         run: |
+          if [ -d "clang-tidy" ]; then
+            rm -rf clang-tidy
+          fi
           if [ -d "clang-format" ]; then
             # Move all files and directories, excluding .git
             find clang-format -mindepth 1 -maxdepth 1 ! -name '.git' -exec mv {} . \;
@@ -281,6 +290,9 @@ jobs:
       - name: Move clang-tidy contents to root
         shell: bash
         run: |
+          if [ -d "clang-format" ]; then
+            rm -rf clang-format
+          fi
           if [ -d "clang-tidy" ]; then
             # Move all files and directories, excluding .git
             find clang-tidy -mindepth 1 -maxdepth 1 ! -name '.git' -exec mv {} . \;
@@ -318,6 +330,9 @@ jobs:
       - name: Move clang-format contents to root
         shell: bash
         run: |
+          if [ -d "clang-tidy" ]; then
+            rm -rf clang-tidy
+          fi
           if [ -d "clang-format" ]; then
             # Move all files and directories, excluding .git
             find clang-format -mindepth 1 -maxdepth 1 ! -name '.git' -exec mv {} . \;
@@ -369,6 +384,9 @@ jobs:
       - name: Move clang-tidy contents to root
         shell: bash
         run: |
+          if [ -d "clang-format" ]; then
+            rm -rf clang-format
+          fi
           if [ -d "clang-tidy" ]; then
             # Move all files and directories, excluding .git
             find clang-tidy -mindepth 1 -maxdepth 1 ! -name '.git' -exec mv {} . \;
