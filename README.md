@@ -1,5 +1,7 @@
 # clang-tools Python distribution
 
+[![Build clang-tools wheels](https://github.com/cpp-linter/clang-tools-wheel/actions/workflows/clang-tools-release.yml/badge.svg)](https://github.com/cpp-linter/clang-tools-wheel/actions/workflows/clang-tools-release.yml)
+
 This project provides **Python wheels** for clang-tools including `clang-format`, `clang-tidy`, making them easy to install via pip.
 
 We aim to publish wheels for each major and minor release of `clang-format` and `clang-tidy`.
