@@ -262,7 +262,7 @@ jobs:
         run: |
           echo "${{ github.event.inputs.llvm_version }}.${{ github.event.inputs.wheel_version }}" > clang-format_version.txt
           cat clang-format_version.txt
- 
+
       - name: Build SDist
         run: pipx run build --sdist
 
@@ -416,7 +416,7 @@ jobs:
   create-draft-release:
     name: Create draft release on GitHub
     needs: [
-      build-clang-format-wheels, 
+      build-clang-format-wheels,
       build-clang-tidy-wheels,
       build-clang-format-sdist,
       build-clang-tidy-sdist,
@@ -449,7 +449,7 @@ jobs:
           # Copy clang-tidy artifacts
           find clang-tidy-dist -name "*.whl" -exec cp {} release-assets/ \;
           find clang-tidy-dist -name "*.tar.gz" -exec cp {} release-assets/ \;
-          
+
           echo "Release assets:"
           ls -la release-assets/
 
@@ -462,22 +462,22 @@ jobs:
           name: "v${{ github.event.inputs.llvm_version }}"
           body: |
             # Clang Tools Python wheels
-            
+
             This release contains both `clang-format` and `clang-tidy` wheel packages.
-            
+
             ## Included packages:
             - **clang-format**: Code formatting tool
             - **clang-tidy**: Static analysis and linting tool
-            
+
             ## Installation:
             ```bash
             # Install clang-format
             pip install clang-format-${{ github.event.inputs.llvm_version }}-<platform>.whl
-            
-            # Install clang-tidy  
+
+            # Install clang-tidy
             pip install clang-tidy-${{ github.event.inputs.llvm_version }}-<platform>.whl
             ```
-            
+
             ## Assets:
             - `.whl` files: Binary wheel packages for different platforms
             - `.tar.gz` files: Source distributions
