@@ -6,13 +6,33 @@ This project provides **Python wheels** for clang-tools including `clang-format`
 
 We aim to publish wheels for each major and minor release of `clang-format` and `clang-tidy`.
 
-## Use with pipx or uv
+## Quick Install
 
-You can install clang-format or clang-tidy via [`pipx`](https://pypa.github.io/pipx/) or [`uv`](https://docs.astral.sh/uv/):
+Download the appropriate wheel for your platform automatically.
+
+**Usage:**
 
 ```bash
-pipx install git+https://github.com/cpp-linter/clang-tools-wheel.git#subdirectory=clang-format
-pipx install git+https://github.com/cpp-linter/clang-tools-wheel.git#subdirectory=clang-tidy
+# Get download.py script
+curl -sSL https://raw.githubusercontent.com/cpp-linter/clang-tools-wheel/main/download.py
+
+# Download latest clang-format for your platform
+python3 download.py clang-format
+
+# Download latest clang-tidy for your platform
+python3 download.py clang-tidy
+
+# Download specific version
+python3 download.py clang-format --version 20.1.8
+
+# Download to specific directory
+python3 download.py clang-format --output ./wheels
+
+# List all available platforms
+python3 download.py clang-format --list-platforms
+
+# Override platform detection (advanced)
+python3 download.py clang-format --platform win_amd64
 ```
 
 ## Use from pre-commit
@@ -31,6 +51,28 @@ repos:
       - id: clang-tidy
         args: [--checks=.clang-tidy] # Loads checks from .clang-tidy file
 ```
+
+## Supported Platforms
+
+| Platform | Architecture | Wheel Tag |
+|----------|-------------|-----------|
+| **macOS** | Intel (x86_64) | `macosx_10_9_x86_64` |
+| **macOS** | Apple Silicon (arm64) | `macosx_11_0_arm64` |
+| **Linux** | x86_64 (glibc) | `manylinux_2_27_x86_64` |
+| **Linux** | x86_64 (musl) | `musllinux_1_2_x86_64` |
+| **Linux** | aarch64 (glibc) | `manylinux_2_26_aarch64` |
+| **Linux** | aarch64 (musl) | `musllinux_1_2_aarch64` |
+| **Linux** | i686 (glibc) | `manylinux_2_26_i686` |
+| **Linux** | i686 (musl) | `musllinux_1_2_i686` |
+| **Linux** | ppc64le (glibc) | `manylinux_2_26_ppc64le` |
+| **Linux** | ppc64le (musl) | `musllinux_1_2_ppc64le` |
+| **Linux** | s390x (glibc) | `manylinux_2_26_s390x` |
+| **Linux** | s390x (musl) | `musllinux_1_2_s390x` |
+| **Linux** | armv7l (glibc) | `manylinux_2_31_armv7l` |
+| **Linux** | armv7l (musl) | `musllinux_1_2_armv7l` |
+| **Windows** | 64-bit | `win_amd64` |
+| **Windows** | 32-bit | `win32` |
+| **Windows** | ARM64 | `win_arm64` |
 
 ## Acknowledgements
 

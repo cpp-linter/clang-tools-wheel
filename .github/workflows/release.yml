@@ -1,7 +1,6 @@
-name: Build clang-tools wheels
+name: Release Python Wheels
 
 on:
-
   workflow_dispatch:
     inputs:
       llvm_version:
@@ -16,6 +15,12 @@ on:
         description: "Emulation builds to skip (e.g. qemu)"
         required: false
         default: ""
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'clang-format/**'
+      - 'clang-tidy/**'
+      - '.github/workflows/release.yml'
 
 jobs:
   build-clang-format-wheels:
@@ -425,6 +430,7 @@ jobs:
       test-clang-tidy-sdist
     ]
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
 
@@ -472,11 +478,16 @@ jobs:
 
             ## Installation:
             ```bash
-            # Install clang-format
-            pip install clang-format-${{ github.event.inputs.llvm_version }}-<platform>.whl
+            # Get download.py script
+            curl -sSL https://raw.githubusercontent.com/cpp-linter/clang-tools-wheel/main/download.py
 
-            # Install clang-tidy
-            pip install clang-tidy-${{ github.event.inputs.llvm_version }}-<platform>.whl
+            # Download and install clang-format
+            python3 download.py clang-format --version ${{ github.event.inputs.llvm_version }}
+            pip install clang-format-*.whl
+
+            # Download and install clang-tidy
+            python3 download.py clang-tidy --version ${{ github.event.inputs.llvm_version }}
+            pip install clang-tidy-*.whl
             ```
 
             ## Assets:
