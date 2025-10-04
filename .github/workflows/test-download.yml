@@ -86,7 +86,7 @@ jobs:
         ls -la test-downloads/
         TOOL="${{ matrix.tool }}"
         TOOL_UNDERSCORE="${TOOL//-/_}"
-        
+
         # Check if wheel file exists
         if [ "$(ls test-downloads/${TOOL}*.whl 2>/dev/null | wc -l)" -eq 0 ]; then
           # Try with underscore naming
@@ -120,7 +120,7 @@ jobs:
       run: |
         TOOL="${{ matrix.tool }}"
         TOOL_UNDERSCORE="${TOOL//-/_}"
-        
+
         # Try to install the wheel (try both naming conventions)
         if ls test-downloads/${TOOL}*.whl >/dev/null 2>&1; then
           pip install test-downloads/${TOOL}*.whl
@@ -136,7 +136,7 @@ jobs:
       run: |
         TOOL="${{ matrix.tool }}"
         TOOL_CMD="${TOOL//-/_}"  # Replace hyphens with underscores
-        
+
         # Test basic functionality
         if command -v $TOOL_CMD &> /dev/null; then
           echo "✅ $TOOL_CMD is available in PATH"
@@ -145,7 +145,7 @@ jobs:
           echo "⚠️  $TOOL_CMD not found in PATH, checking python module"
           python3 -m $TOOL_CMD --version || python3 -m $TOOL_CMD --help | head -5 || true
         fi
-        
+
     - name: Test platform override functionality
       run: |
         # Test with a different but compatible platform
