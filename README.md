@@ -14,7 +14,7 @@ Download the appropriate wheel for your platform automatically.
 
 ```bash
 # Get download.py script
-curl -sSL https://raw.githubusercontent.com/cpp-linter/clang-tools-wheel/main/download.py
+curl -sSL https://raw.githubusercontent.com/cpp-linter/clang-tools-wheel/main/download.py -o download.py
 
 # Download latest clang-format for your platform
 python3 download.py clang-format
