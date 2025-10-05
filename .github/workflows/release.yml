@@ -30,7 +30,7 @@ jobs:
   build-clang-format-wheels:
     name: "clang-format :: ${{ matrix.os }} :: ${{ matrix.platform }}-${{ matrix.arch }}"
     runs-on: ${{ matrix.os }}
-
+    if: github.event_name == 'workflow_dispatch' # only build on manual trigger to save time and resources
     strategy:
       matrix:
         # emulated linux: generate 4 matrix combinations with qemu on ubuntu:
@@ -150,7 +150,7 @@ jobs:
   build-clang-tidy-wheels:
     name: "clang-tidy :: ${{ matrix.os }} :: ${{ matrix.platform }}-${{ matrix.arch }}"
     runs-on: ${{ matrix.os }}
-
+    if: github.event_name == 'workflow_dispatch' # only build on manual trigger to save time and resources
     strategy:
       matrix:
         include:
@@ -466,7 +466,7 @@ jobs:
 
       - name: Create draft release
         uses: softprops/action-gh-release@v2
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' # only create release on manual trigger
         with:
           draft: true
           files: release-assets/*
