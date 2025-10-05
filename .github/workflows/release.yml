@@ -1,7 +1,10 @@
-name: Build clang-tools wheels
+name: Release Python Wheels
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 on:
-
   workflow_dispatch:
     inputs:
       llvm_version:
@@ -16,12 +19,18 @@ on:
         description: "Emulation builds to skip (e.g. qemu)"
         required: false
         default: ""
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'clang-format/**'
+      - 'clang-tidy/**'
+      - '.github/workflows/release.yml'
 
 jobs:
   build-clang-format-wheels:
     name: "clang-format :: ${{ matrix.os }} :: ${{ matrix.platform }}-${{ matrix.arch }}"
     runs-on: ${{ matrix.os }}
-
+    if: github.event_name == 'workflow_dispatch' # only build on manual trigger to save time and resources
     strategy:
       matrix:
         # emulated linux: generate 4 matrix combinations with qemu on ubuntu:
@@ -141,7 +150,7 @@ jobs:
   build-clang-tidy-wheels:
     name: "clang-tidy :: ${{ matrix.os }} :: ${{ matrix.platform }}-${{ matrix.arch }}"
     runs-on: ${{ matrix.os }}
-
+    if: github.event_name == 'workflow_dispatch' # only build on manual trigger to save time and resources
     strategy:
       matrix:
         include:
@@ -425,6 +434,7 @@ jobs:
       test-clang-tidy-sdist
     ]
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
 
@@ -456,7 +466,7 @@ jobs:
 
       - name: Create draft release
         uses: softprops/action-gh-release@v2
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' # only create release on manual trigger
         with:
           draft: true
           files: release-assets/*
@@ -472,11 +482,13 @@ jobs:
 
             ## Installation:
             ```bash
-            # Install clang-format
-            pip install clang-format-${{ github.event.inputs.llvm_version }}-<platform>.whl
+            # Download and install clang-format
+            curl -LsSf https://cpp-linter.github.io/install-wheel.sh | bash -s -- clang-format --version ${{ github.event.inputs.llvm_version }}
+            pip install clang-format-*.whl
 
-            # Install clang-tidy
-            pip install clang-tidy-${{ github.event.inputs.llvm_version }}-<platform>.whl
+            # Download and install clang-tidy
+            curl -LsSf https://cpp-linter.github.io/install-wheel.sh | bash -s -- clang-tidy --version ${{ github.event.inputs.llvm_version }}
+            pip install clang-tidy-*.whl
             ```
 
             ## Assets:
