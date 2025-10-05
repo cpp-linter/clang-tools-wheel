@@ -2,15 +2,11 @@
 
 [![Build clang-tools wheels](https://github.com/cpp-linter/clang-tools-wheel/actions/workflows/clang-tools-release.yml/badge.svg)](https://github.com/cpp-linter/clang-tools-wheel/actions/workflows/clang-tools-release.yml)
 
-This project provides **Python wheels** for clang-tools including `clang-format`, `clang-tidy`, making them easy to install via pip.
-
-We aim to publish wheels for each major and minor release of `clang-format` and `clang-tidy`.
+This project provides **Python wheels** for clang-tools like `clang-format`, `clang-tidy`, making them easy to install via **pip**.
 
 ## Quick Install
 
-Download the appropriate wheel for your platform automatically.
-
-**Usage:**
+You can download and install `clang-format` or `clang-tidy` wheels using the following command:
 
 ```bash
 # Download latest clang-format wheel
@@ -72,4 +68,4 @@ This project builds on the excellent work of:
 * [clang-format-wheel](https://github.com/ssciwr/clang-format-wheel)
 * [clang-tidy-wheel](https://github.com/ssciwr/clang-tidy-wheel)
 
-We redistribute these wheels through GitHub releases for the [cpp-linter-hooks](https://github.com/cpp-linter/cpp-linter-hooks) project.
+We redistribute these wheels through [GitHub releases](https://github.com/cpp-linter/clang-tools-wheel/releases) for the [cpp-linter-hooks](https://github.com/cpp-linter/cpp-linter-hooks) project.
