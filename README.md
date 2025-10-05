@@ -13,26 +13,17 @@ Download the appropriate wheel for your platform automatically.
 **Usage:**
 
 ```bash
-# Get download.py script
-curl -sSL https://raw.githubusercontent.com/cpp-linter/clang-tools-wheel/main/download.py -o download.py
+# Download latest clang-format wheel
+curl -LsSf https://cpp-linter.github.io/install-wheel.sh | bash -s -- clang-format
 
-# Download latest clang-format for your platform
-python3 download.py clang-format
+# Download clang-tidy with specific version
+curl -LsSf https://cpp-linter.github.io/install-wheel.sh | bash -s -- clang-tidy --version 21.1.2
 
-# Download latest clang-tidy for your platform
-python3 download.py clang-tidy
-
-# Download specific version
-python3 download.py clang-format --version 20.1.8
+# List available platforms
+curl -LsSf https://cpp-linter.github.io/install-wheel.sh | bash -s -- --list clang-format
 
 # Download to specific directory
-python3 download.py clang-format --output ./wheels
-
-# List all available platforms
-python3 download.py clang-format --list-platforms
-
-# Override platform detection (advanced)
-python3 download.py clang-format --platform win_amd64
+curl -LsSf https://cpp-linter.github.io/install-wheel.sh | bash -s -- clang-format --output ./wheels
 ```
 
 ## Use from pre-commit

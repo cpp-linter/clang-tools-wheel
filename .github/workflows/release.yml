@@ -483,11 +483,11 @@ jobs:
             ## Installation:
             ```bash
             # Download and install clang-format
-            curl -sSL https://raw.githubusercontent.com/cpp-linter/clang-tools-wheel/feature/main/download.py | python3 - clang-format --version ${{ github.event.inputs.llvm_version }}
+            curl -LsSf https://cpp-linter.github.io/install-wheel.sh | bash -s -- clang-format --version ${{ github.event.inputs.llvm_version }}
             pip install clang-format-*.whl
 
             # Download and install clang-tidy
-            curl -sSL https://raw.githubusercontent.com/cpp-linter/clang-tools-wheel/feature/main/download.py | python3 - clang-tidy --version ${{ github.event.inputs.llvm_version }}
+            curl -LsSf https://cpp-linter.github.io/install-wheel.sh | bash -s -- clang-tidy --version ${{ github.event.inputs.llvm_version }}
             pip install clang-tidy-*.whl
             ```
 
