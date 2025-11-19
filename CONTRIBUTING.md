@@ -9,6 +9,9 @@ git clone https://github.com/cpp-linter/clang-tools-wheel.git
 
 cd clang-tools-wheel
 
-# update submodules
-git submodule update --init --recursive
+# Update submodules to their latest commits
+git submodule update --remote --merge
+
+git add .
+git commit -m "Update submodules to latest commits"
 ```
