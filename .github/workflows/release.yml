@@ -87,7 +87,7 @@ jobs:
             arch: "arm64"
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         sparse-checkout: |
           clang-format
@@ -130,19 +130,19 @@ jobs:
         cat clang-format_version.txt
 
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3.6.0
+      uses: docker/setup-qemu-action@v3.7.0
       with:
         image: tonistiigi/binfmt:qemu-v8.1.5
       if: runner.os == 'Linux' && matrix.emulation == 'qemu'
 
     - name: Build wheels
-      uses: pypa/cibuildwheel@v3.1
+      uses: pypa/cibuildwheel@v3.3.0
       env:
         CIBW_ARCHS: "${{ matrix.arch }}"
         # restrict to a single Python version as wheel does not depend on Python:
         CIBW_BUILD: "cp311-${{ matrix.platform }}*"
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: clang-format-wheels-${{ matrix.platform }}-${{ matrix.arch }}
         path: ./wheelhouse/*.whl
@@ -186,7 +186,7 @@ jobs:
             arch: "arm64"
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         sparse-checkout: |
           clang-tidy
@@ -227,7 +227,7 @@ jobs:
         cat clang-tidy_version.txt
 
     - name: Build wheels
-      uses: pypa/cibuildwheel@v2.23.2
+      uses: pypa/cibuildwheel@v3.3.0
       env:
         CIBW_ARCHS: "${{ matrix.arch }}"
         CIBW_BEFORE_TEST: rm -rf {package}/clang_tidy
@@ -237,7 +237,7 @@ jobs:
         # restrict to a single Python version as wheel does not depend on Python:
         CIBW_BUILD: "cp311-${{ matrix.platform }}*"
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: clang-tidy-wheels-${{ matrix.platform }}-${{ matrix.arch }}
         path: ./wheelhouse/*.whl
@@ -247,7 +247,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           sparse-checkout: |
             clang-format
@@ -276,7 +276,7 @@ jobs:
       - name: Build SDist
         run: pipx run build --sdist
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: clang-format-sdist
           path: dist/*.tar.gz
@@ -286,7 +286,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           sparse-checkout: |
             clang-tidy
@@ -315,7 +315,7 @@ jobs:
       - name: Build SDist
         run: pipx run build --sdist
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           path: dist/*.tar.gz
           name: clang-tidy-sdist
@@ -326,7 +326,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           sparse-checkout: |
             clang-format
@@ -346,12 +346,12 @@ jobs:
             rm -rf clang-format
           fi
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         name: Install Python
         with:
           python-version: '3.13'
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: clang-format-sdist
           path: sdist
@@ -380,7 +380,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           sparse-checkout: |
             clang-tidy
@@ -400,12 +400,12 @@ jobs:
             rm -rf clang-tidy
           fi
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         name: Install Python
         with:
           python-version: '3.13'
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: clang-tidy-sdist
           path: sdist
@@ -439,13 +439,13 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           pattern: clang-format-*
           merge-multiple: true
           path: clang-format-dist
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           pattern: clang-tidy-*
           merge-multiple: true
