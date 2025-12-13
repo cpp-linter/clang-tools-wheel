@@ -87,7 +87,7 @@ jobs:
             arch: "arm64"
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6.0.1
       with:
         sparse-checkout: |
           clang-format
@@ -113,7 +113,7 @@ jobs:
 
     - name: Set up msvc on Windows
       if: runner.os == 'Windows'
-      uses: ilammy/msvc-dev-cmd@v1
+      uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756  # v1
       with:
         arch: ${{ matrix.arch }}
 
@@ -130,19 +130,19 @@ jobs:
         cat clang-format_version.txt
 
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3.7.0
+      uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130  # v3.7.0
       with:
         image: tonistiigi/binfmt:qemu-v8.1.5
       if: runner.os == 'Linux' && matrix.emulation == 'qemu'
 
     - name: Build wheels
-      uses: pypa/cibuildwheel@v3.3.0
+      uses: pypa/cibuildwheel@63fd63b352a9a8bdcc24791c9dbee952ee9a8abc  # v3.3.0
       env:
         CIBW_ARCHS: "${{ matrix.arch }}"
         # restrict to a single Python version as wheel does not depend on Python:
         CIBW_BUILD: "cp311-${{ matrix.platform }}*"
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4  # v5
       with:
         name: clang-format-wheels-${{ matrix.platform }}-${{ matrix.arch }}
         path: ./wheelhouse/*.whl
@@ -186,7 +186,7 @@ jobs:
             arch: "arm64"
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6.0.1
       with:
         sparse-checkout: |
           clang-tidy
@@ -212,7 +212,7 @@ jobs:
 
     - name: Set up msvc on Windows
       if: runner.os == 'Windows'
-      uses: ilammy/msvc-dev-cmd@v1
+      uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756  # v1
       with:
         arch: ${{ matrix.arch }}
 
@@ -227,7 +227,7 @@ jobs:
         cat clang-tidy_version.txt
 
     - name: Build wheels
-      uses: pypa/cibuildwheel@v3.3.0
+      uses: pypa/cibuildwheel@63fd63b352a9a8bdcc24791c9dbee952ee9a8abc  # v3.3.0
       env:
         CIBW_ARCHS: "${{ matrix.arch }}"
         CIBW_BEFORE_TEST: rm -rf {package}/clang_tidy
@@ -237,7 +237,7 @@ jobs:
         # restrict to a single Python version as wheel does not depend on Python:
         CIBW_BUILD: "cp311-${{ matrix.platform }}*"
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4  # v5
       with:
         name: clang-tidy-wheels-${{ matrix.platform }}-${{ matrix.arch }}
         path: ./wheelhouse/*.whl
@@ -247,7 +247,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6.0.1
         with:
           sparse-checkout: |
             clang-format
@@ -276,7 +276,7 @@ jobs:
       - name: Build SDist
         run: pipx run build --sdist
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4  # v5
         with:
           name: clang-format-sdist
           path: dist/*.tar.gz
@@ -286,7 +286,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6.0.1
         with:
           sparse-checkout: |
             clang-tidy
@@ -315,7 +315,7 @@ jobs:
       - name: Build SDist
         run: pipx run build --sdist
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4  # v5
         with:
           path: dist/*.tar.gz
           name: clang-tidy-sdist
@@ -326,7 +326,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6.0.1
         with:
           sparse-checkout: |
             clang-format
@@ -346,12 +346,12 @@ jobs:
             rm -rf clang-format
           fi
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548  # v6
         name: Install Python
         with:
           python-version: '3.13'
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53  # v6
         with:
           name: clang-format-sdist
           path: sdist
@@ -380,7 +380,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6.0.1
         with:
           sparse-checkout: |
             clang-tidy
@@ -400,12 +400,12 @@ jobs:
             rm -rf clang-tidy
           fi
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548  # v6
         name: Install Python
         with:
           python-version: '3.13'
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53  # v6
         with:
           name: clang-tidy-sdist
           path: sdist
@@ -439,13 +439,13 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53  # v6
         with:
           pattern: clang-format-*
           merge-multiple: true
           path: clang-format-dist
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53  # v6
         with:
           pattern: clang-tidy-*
           merge-multiple: true
@@ -465,7 +465,7 @@ jobs:
           ls -la release-assets/
 
       - name: Create draft release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b  # v2
         if: github.event_name == 'workflow_dispatch' # only create release on manual trigger
         with:
           draft: true
