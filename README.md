@@ -1,8 +1,7 @@
 # clang-tools Python distribution
 
-> [![cpp-linter hub](https://img.shields.io/badge/%F0%9F%8F%A0_cpp--linter_hub-%E2%86%90_home-22863a)](https://cpp-linter.github.io/)
-
 [![Release Python Wheels](https://github.com/cpp-linter/clang-tools-wheel/actions/workflows/release.yml/badge.svg)](https://github.com/cpp-linter/clang-tools-wheel/actions/workflows/release.yml)
+[![cpp-linter hub](https://img.shields.io/badge/%F0%9F%8F%A0_cpp--linter_hub-%E2%86%90_home-22863a)](https://cpp-linter.github.io/)
 
 This project provides pip-installable Python wheels for `clang-format` and `clang-tidy`.
 
