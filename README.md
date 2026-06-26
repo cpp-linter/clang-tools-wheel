@@ -3,7 +3,7 @@
 [![Release Python Wheels](https://github.com/cpp-linter/clang-tools-wheel/actions/workflows/release.yml/badge.svg)](https://github.com/cpp-linter/clang-tools-wheel/actions/workflows/release.yml)
 [![cpp-linter hub](https://img.shields.io/badge/%F0%9F%8F%A0_cpp--linter_hub-%E2%86%90_home-22863a)](https://cpp-linter.github.io/)
 
-This project provides pip-installable Python wheels for `clang-format` and `clang-tidy`.
+This project builds and publishes pip-installable Python wheels for `clang-format` and `clang-tidy` to GitHub releases. The wheels are bundled from upstream [ssciwr](https://github.com/ssciwr) projects and can be installed via `pip install` directly from PyPI or by using the helper script below.
 
 ## Quick Install
 
@@ -25,7 +25,7 @@ curl -LsSf https://cpp-linter.github.io/install-wheel.sh | bash -s -- clang-form
 
 ## Use from pre-commit
 
-[pre-commit](https://pre-commit.com/) hooks are available for both `clang-format` and `clang-tidy`.
+The [cpp-linter-hooks](https://github.com/cpp-linter/cpp-linter-hooks) project provides [pre-commit](https://pre-commit.com/) hooks for both `clang-format` and `clang-tidy`. It installs the tools dynamically from PyPI — the same wheels built by this project and published there by upstream maintainers.
 
 Example `.pre-commit-config.yaml`:
 
@@ -69,4 +69,4 @@ This project builds on the excellent work of:
 * [clang-format-wheel](https://github.com/ssciwr/clang-format-wheel)
 * [clang-tidy-wheel](https://github.com/ssciwr/clang-tidy-wheel)
 
-We redistribute these wheels through [GitHub releases](https://github.com/cpp-linter/clang-tools-wheel/releases) for the [cpp-linter-hooks](https://github.com/cpp-linter/cpp-linter-hooks) project.
+These wheels are published as [GitHub releases](https://github.com/cpp-linter/clang-tools-wheel/releases) for general use.
