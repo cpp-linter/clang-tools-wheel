@@ -32,12 +32,11 @@ Example `.pre-commit-config.yaml`:
 ```yaml
 repos:
   - repo: https://github.com/cpp-linter/cpp-linter-hooks
-    rev: v1.1.3
+    rev: v1.6.0
     hooks:
       - id: clang-format
         args: [--style=file]  # Loads style from .clang-format file
-      - id: clang-tidy
-        args: [--checks=.clang-tidy] # Loads checks from .clang-tidy file
+      - id: clang-tidy  # clang-tidy reads your .clang-tidy file by itself
 ```
 
 ## Supported Platforms
