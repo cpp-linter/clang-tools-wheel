@@ -1,6 +1,6 @@
 # Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
+Contributions are welcome! Issues are turned off in this repository, so please start a discussion in [cpp-linter Discussions](https://github.com/orgs/cpp-linter/discussions) or submit a pull request for any improvements or bug fixes.
 
 ## Development Setup
 
