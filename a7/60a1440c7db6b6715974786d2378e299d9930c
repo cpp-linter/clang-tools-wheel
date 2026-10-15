@@ -1,0 +1,19 @@
+.github/workflows/release.yml
+  s_f518a1c9328c7b::t_34b6dcbb44d3c1 90,139,189,230,250,289,329,349,383,403,468
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a760a1440c7db6b6715974786d2378e299d9930c",
+  "prompts": {},
+  "sessions": {
+    "s_f518a1c9328c7b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c2b090ca-b947-4998-975f-5d845a56ad69",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
