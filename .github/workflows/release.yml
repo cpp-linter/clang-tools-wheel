@@ -26,9 +26,13 @@ on:
       - 'clang-tidy/**'
       - '.github/workflows/release.yml'
 
+permissions: {}
+
 jobs:
   build-clang-format-wheels:
     name: "clang-format :: ${{ matrix.os }} :: ${{ matrix.platform }}-${{ matrix.arch }}"
+    permissions:
+      contents: read
     runs-on: ${{ matrix.os }}
     if: github.event_name == 'workflow_dispatch' # only build on manual trigger to save time and resources
     strategy:
@@ -93,6 +97,7 @@ jobs:
           clang-format
         sparse-checkout-cone-mode: true
         submodules: true
+        persist-credentials: false
 
     - name: Move clang-format contents to root
       shell: bash
@@ -125,8 +130,12 @@ jobs:
 
     - name: Override LLVM version (${{ github.event.inputs.llvm_version }})
       if: github.event.inputs.llvm_version
+      shell: bash
+      env:
+        LLVM_VERSION: ${{ inputs.llvm_version }}
+        WHEEL_VERSION: ${{ inputs.wheel_version }}
       run: |
-        echo "${{ github.event.inputs.llvm_version }}.${{ github.event.inputs.wheel_version }}" > clang-format_version.txt
+        echo "${LLVM_VERSION}.${WHEEL_VERSION}" > clang-format_version.txt
         cat clang-format_version.txt
 
     - name: Set up QEMU
@@ -149,6 +158,8 @@ jobs:
 
   build-clang-tidy-wheels:
     name: "clang-tidy :: ${{ matrix.os }} :: ${{ matrix.platform }}-${{ matrix.arch }}"
+    permissions:
+      contents: read
     runs-on: ${{ matrix.os }}
     if: github.event_name == 'workflow_dispatch' # only build on manual trigger to save time and resources
     strategy:
@@ -192,6 +203,7 @@ jobs:
           clang-tidy
         sparse-checkout-cone-mode: true
         submodules: true
+        persist-credentials: false
 
     - name: Move clang-tidy contents to root
       shell: bash
@@ -222,8 +234,12 @@ jobs:
 
     - name: Override LLVM version (${{ github.event.inputs.llvm_version }})
       if: github.event.inputs.llvm_version
+      shell: bash
+      env:
+        LLVM_VERSION: ${{ inputs.llvm_version }}
+        WHEEL_VERSION: ${{ inputs.wheel_version }}
       run: |
-        echo "${{ github.event.inputs.llvm_version }}.${{ github.event.inputs.wheel_version }}" > clang-tidy_version.txt
+        echo "${LLVM_VERSION}.${WHEEL_VERSION}" > clang-tidy_version.txt
         cat clang-tidy_version.txt
 
     - name: Build wheels
@@ -244,6 +260,8 @@ jobs:
 
   build-clang-format-sdist:
     name: Build clang-format source distribution
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
 
     steps:
@@ -253,6 +271,7 @@ jobs:
             clang-format
           sparse-checkout-cone-mode: true
           submodules: true
+          persist-credentials: false
 
       - name: Move clang-format contents to root
         shell: bash
@@ -269,8 +288,12 @@ jobs:
 
       - name: Override LLVM version (${{ github.event.inputs.llvm_version }})
         if: github.event.inputs.llvm_version
+        shell: bash
+        env:
+          LLVM_VERSION: ${{ inputs.llvm_version }}
+          WHEEL_VERSION: ${{ inputs.wheel_version }}
         run: |
-          echo "${{ github.event.inputs.llvm_version }}.${{ github.event.inputs.wheel_version }}" > clang-format_version.txt
+          echo "${LLVM_VERSION}.${WHEEL_VERSION}" > clang-format_version.txt
           cat clang-format_version.txt
 
       - name: Build SDist
@@ -283,6 +306,8 @@ jobs:
 
   build-clang-tidy-sdist:
     name: Build clang-tidy source distribution
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
 
     steps:
@@ -292,6 +317,7 @@ jobs:
             clang-tidy
           sparse-checkout-cone-mode: true
           submodules: true
+          persist-credentials: false
 
       - name: Move clang-tidy contents to root
         shell: bash
@@ -308,8 +334,12 @@ jobs:
 
       - name: Override LLVM version (${{ github.event.inputs.llvm_version }})
         if: github.event.inputs.llvm_version
+        shell: bash
+        env:
+          LLVM_VERSION: ${{ inputs.llvm_version }}
+          WHEEL_VERSION: ${{ inputs.wheel_version }}
         run: |
-          echo "${{ github.event.inputs.llvm_version }}.${{ github.event.inputs.wheel_version }}" > clang-tidy_version.txt
+          echo "${LLVM_VERSION}.${WHEEL_VERSION}" > clang-tidy_version.txt
           cat clang-tidy_version.txt
 
       - name: Build SDist
@@ -322,6 +352,8 @@ jobs:
 
   test-clang-format-sdist:
     name: Test clang-format build from source distribution
+    permissions:
+      contents: read
     needs: [build-clang-format-sdist]
     runs-on: ubuntu-latest
 
@@ -332,6 +364,7 @@ jobs:
             clang-format
           sparse-checkout-cone-mode: true
           submodules: true
+          persist-credentials: false
 
       - name: Move clang-format contents to root
         shell: bash
@@ -376,6 +409,8 @@ jobs:
 
   test-clang-tidy-sdist:
     name: Test clang-tidy build from source distribution
+    permissions:
+      contents: read
     needs: [build-clang-tidy-sdist]
     runs-on: ubuntu-latest
 
@@ -386,6 +421,7 @@ jobs:
             clang-tidy
           sparse-checkout-cone-mode: true
           submodules: true
+          persist-credentials: false
 
       - name: Move clang-tidy contents to root
         shell: bash
